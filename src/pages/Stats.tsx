@@ -94,7 +94,7 @@ export function Stats() {
                             const isToday = data.day === 'Wed'; // Mock today
 
                             return (
-                                <div key={i} className="flex flex-col items-center flex-1 gap-4 group">
+                                <div key={i} className="flex flex-col items-center flex-1 h-full gap-4 group">
                                     <div className="w-full relative h-full flex items-end justify-center">
                                         {/* Tooltip on hover */}
                                         <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-void/90 px-2 py-1 rounded text-xs font-mono font-bold border border-white/10 z-10">
