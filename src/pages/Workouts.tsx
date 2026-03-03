@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { WorkoutCard } from '../components/WorkoutCard';
 import { Filter, Search } from 'lucide-react';
+import { useState } from 'react';
 
 const WORKOUTS = [
     {
@@ -24,7 +25,7 @@ const WORKOUTS = [
         title: 'Electric HIIT',
         duration: 20,
         level: 'All Levels',
-        category: 'Cardio',
+        category: 'HIIT',
         imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop',
     },
     {
@@ -32,14 +33,28 @@ const WORKOUTS = [
         title: 'Cyber Recovery stretch',
         duration: 10,
         level: 'Beginner',
-        category: 'Flexibility',
+        category: 'Yoga',
         imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2069&auto=format&fit=crop',
+    },
+    {
+        id: '5',
+        title: 'Volt Sprint Intervals',
+        duration: 25,
+        level: 'Advanced',
+        category: 'Cardio',
+        imageUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?q=80&w=2069&auto=format&fit=crop',
     }
 ];
 
 const FILTERS = ['All', 'Strength', 'Cardio', 'Core', 'HIIT', 'Yoga'];
 
 export function Workouts() {
+    const [activeFilter, setActiveFilter] = useState('All');
+
+    const filteredWorkouts = WORKOUTS.filter(workout =>
+        activeFilter === 'All' || workout.category === activeFilter
+    );
+
     const container = {
         hidden: { opacity: 0 },
         show: {
@@ -82,28 +97,52 @@ export function Workouts() {
 
             {/* Filter Pills */}
             <motion.div variants={item} className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {FILTERS.map((filter, index) => (
-                    <button
-                        key={filter}
-                        className={`whitespace-nowrap px-5 py-2 rounded-full font-medium text-sm transition-all shadow-lg ${index === 0
-                                ? 'bg-gradient-to-r from-electric to-blue-600 text-void border border-transparent'
-                                : 'bg-surface border border-white/5 text-gray-300 hover:text-white hover:border-electric/50'
-                            }`}
-                    >
-                        {filter}
-                    </button>
-                ))}
+                {FILTERS.map((filter) => {
+                    const isActive = activeFilter === filter;
+                    return (
+                        <button
+                            key={filter}
+                            onClick={() => setActiveFilter(filter)}
+                            className={`whitespace-nowrap px-5 py-2 rounded-full font-medium text-sm transition-all shadow-lg ${isActive
+                                    ? 'bg-gradient-to-r from-electric to-blue-600 text-void border border-transparent'
+                                    : 'bg-surface border border-white/5 text-gray-300 hover:text-white hover:border-electric/50'
+                                }`}
+                        >
+                            {filter}
+                        </button>
+                    );
+                })}
             </motion.div>
 
             {/* Grid */}
             <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {WORKOUTS.map(workout => (
-                    <WorkoutCard key={workout.id} {...workout} />
-                ))}
-                {/* Fill empty spots for visual demo */}
-                {WORKOUTS.map(workout => (
-                    <WorkoutCard key={workout.id + '_dup'} {...workout} />
-                )).slice(0, 2)}
+                <AnimatePresence mode="popLayout">
+                    {filteredWorkouts.map(workout => (
+                        <motion.div
+                            key={workout.id}
+                            layout
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <WorkoutCard {...workout} />
+                        </motion.div>
+                    ))}
+                    {/* Fill empty spots for visual demo if showing 'All' */}
+                    {activeFilter === 'All' && filteredWorkouts.map(workout => (
+                        <motion.div
+                            key={workout.id + '_dup'}
+                            layout
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <WorkoutCard {...workout} />
+                        </motion.div>
+                    )).slice(0, 2)}
+                </AnimatePresence>
             </motion.div>
         </motion.div>
     );
