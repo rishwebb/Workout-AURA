@@ -1,7 +1,10 @@
-import { motion } from 'framer-motion';
-import { Settings, LogOut, User, Bell, Shield, Smartphone, ChevronRight, Edit2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings, LogOut, User, Bell, Shield, Smartphone, ChevronRight, Edit2, X } from 'lucide-react';
+import { useState } from 'react';
 
 export function Profile() {
+    const [activeSetting, setActiveSetting] = useState<string | null>(null);
+
     const container = {
         hidden: { opacity: 0 },
         show: {
@@ -65,11 +68,15 @@ export function Profile() {
                     <h3 className="text-xl font-heading font-bold mb-6 text-gray-400">Account</h3>
                     <div className="space-y-4">
                         {[
-                            { icon: User, label: 'Personal Information' },
-                            { icon: Shield, label: 'Password & Security' },
-                            { icon: Bell, label: 'Notifications' },
-                        ].map((setting, i) => (
-                            <button key={i} className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group">
+                            { id: 'personal', icon: User, label: 'Personal Information' },
+                            { id: 'security', icon: Shield, label: 'Password & Security' },
+                            { id: 'notifications', icon: Bell, label: 'Notifications' },
+                        ].map((setting) => (
+                            <button
+                                key={setting.id}
+                                onClick={() => setActiveSetting(setting.id)}
+                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group"
+                            >
                                 <div className="flex items-center gap-4">
                                     <div className="p-2 bg-void rounded-xl border border-white/5 group-hover:border-electric/50 transition-colors">
                                         <setting.icon size={20} className="text-gray-300 group-hover:text-electric transition-colors" />
@@ -87,10 +94,14 @@ export function Profile() {
                     <h3 className="text-xl font-heading font-bold mb-6 text-gray-400">Preferences</h3>
                     <div className="space-y-4">
                         {[
-                            { icon: Settings, label: 'App Settings' },
-                            { icon: Smartphone, label: 'Connected Devices' },
-                        ].map((setting, i) => (
-                            <button key={i} className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group">
+                            { id: 'app', icon: Settings, label: 'App Settings' },
+                            { id: 'devices', icon: Smartphone, label: 'Connected Devices' },
+                        ].map((setting) => (
+                            <button
+                                key={setting.id}
+                                onClick={() => setActiveSetting(setting.id)}
+                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group"
+                            >
                                 <div className="flex items-center gap-4">
                                     <div className="p-2 bg-void rounded-xl border border-white/5 group-hover:border-volt/50 transition-colors">
                                         <setting.icon size={20} className="text-gray-300 group-hover:text-volt transition-colors" />
@@ -114,6 +125,60 @@ export function Profile() {
                 </motion.div>
 
             </div>
+
+            {/* Settings Modal */}
+            <AnimatePresence>
+                {activeSetting && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setActiveSetting(null)}
+                            className="absolute inset-0 bg-void/80 backdrop-blur-sm cursor-pointer"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="glass w-full max-w-lg rounded-3xl p-8 relative z-10 border-white/10 shadow-2xl"
+                        >
+                            <button
+                                onClick={() => setActiveSetting(null)}
+                                className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <h2 className="text-2xl font-heading font-bold mb-6 capitalize flex items-center gap-3">
+                                <Settings className="text-electric" />
+                                {activeSetting.replace('-', ' ')}
+                            </h2>
+
+                            <div className="space-y-4">
+                                <p className="text-gray-400 mb-8">
+                                    This is a placeholder view for the {activeSetting.replace('-', ' ')} settings. In a real application, this would contain form fields and toggles connected to the user database.
+                                </p>
+
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setActiveSetting(null)}
+                                        className="flex-1 py-3 px-6 rounded-xl bg-white/5 hover:bg-white/10 font-medium transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveSetting(null)}
+                                        className="flex-1 py-3 px-6 rounded-xl bg-electric hover:bg-[#00cce5] text-void font-bold shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 }
